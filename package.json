@@ -1,0 +1,20 @@
+{
+  "name": "@shakesco/private",
+  "version": "1.0.0",
+  "description": "Shakesco Stealth payments package",
+  "main": "index.js",
+  "keywords": [
+    "shakesco",
+    "private",
+    "payments",
+    "ethereum",
+    "polygon",
+    "contract"
+  ],
+  "author": "shawn kimtai",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "@noble/secp256k1": "^2.0.0",
+    "ethers": "^5.7.2"
+  }
+}
