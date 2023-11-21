@@ -1,5 +1,13 @@
 const ethers = require("ethers");
-const { utils } = ethers;
+const {
+  isHexString,
+  getBytes,
+  resolveProperties,
+  Signature,
+  Transaction,
+  keccak256,
+  verifyMessage,
+} = ethers;
 
 /**
  * @notice Adds leading zeroes to ensure hex strings are the expected length.
@@ -17,7 +25,7 @@ const { utils } = ethers;
  * @param {String} bytes Number of bytes string should have
  */
 module.exports.padHex = (hex, bytes = 32) => {
-  if (!utils.isHexString) throw new Error("Input is not a valid hex string");
+  if (!isHexString(hex)) throw new Error("Input is not a valid hex string");
   if (hex.slice(0, 2) === "0x") {
     throw new Error("Input must not contain 0x prefix");
   }
@@ -35,7 +43,7 @@ module.exports.lengths = {
  * @notice Convert hex string with 0x prefix into Buffer
  * @param {String} data Hex string to convert
  */
-module.exports.hexStringToBuffer = (data) => Buffer.from(utils.arrayify(data));
+module.exports.hexStringToBuffer = (data) => Buffer.from(getBytes(data));
 
 /**
  * @notice Given a transaction hash, return the public key of the transaction's sender
@@ -46,7 +54,7 @@ module.exports.hexStringToBuffer = (data) => Buffer.from(utils.arrayify(data));
  */
 module.exports.recoverPublicKeyFromTransaction = async (txHash, provider) => {
   // Get transaction data
-  const ethersProvider = new ethers.providers.Web3Provider(provider);
+  const ethersProvider = new ethers.JsonRpcProvider(provider);
   const tx = await ethersProvider.getTransaction(txHash);
 
   // Get original signature
@@ -55,7 +63,7 @@ module.exports.recoverPublicKeyFromTransaction = async (txHash, provider) => {
     s: tx.s,
     v: tx.v,
   };
-  const signature = utils.joinSignature(splitSignature);
+  const signature = Signature.from(splitSignature).serialized;
 
   // Reconstruct transaction data that was originally signed
   const txData = {
@@ -69,12 +77,13 @@ module.exports.recoverPublicKeyFromTransaction = async (txHash, provider) => {
   };
 
   // Properly format it to get the correct message
-  const resolvedTx = await utils.resolveProperties(txData);
-  const rawTx = utils.serializeTransaction(resolvedTx);
-  const msgHash = utils.keccak256(rawTx);
-  const msgBytes = utils.arrayify(msgHash);
+  const resolvedTx = await resolveProperties(txData);
+  const rawTx = Transaction.from(resolvedTx).serialized;
+  const msgHash = keccak256(rawTx);
+  const msgBytes = getBytes(msgHash);
 
   // Recover sender's public key and address
-  const publicKey = utils.recoverPublicKey(msgBytes, signature);
+  const publicKey = verifyMessage(msgBytes, signature);
+
   return publicKey;
 };

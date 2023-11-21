@@ -3,8 +3,9 @@
  */
 const ethers = require("ethers");
 const { padHex } = require("../utils/utils");
+const { BigNumber } = require("@ethersproject/bignumber");
 
-const { utils } = ethers;
+const { randomBytes, getBytesCopy } = ethers;
 
 class RandomNumber {
   /**
@@ -13,14 +14,14 @@ class RandomNumber {
    */
   constructor(length = 32) {
     this.length = length;
-    this.value = utils.shuffled(utils.randomBytes(length));
+    this.value = getBytesCopy(randomBytes(length));
   }
 
   /**
    * @notice Get random number as a BigNumber
    */
   get asBN() {
-    return ethers.BigNumber.from(this.value);
+    return BigNumber.from(this.value);
   }
 
   /**

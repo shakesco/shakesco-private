@@ -14,7 +14,8 @@
   "author": "shawn kimtai",
   "license": "GPL-3.0",
   "dependencies": {
+    "@ethersproject/bignumber": "^5.7.0",
     "@noble/secp256k1": "^2.0.0",
-    "ethers": "^5.7.2"
+    "ethers": "^6.8.1"
   }
 }
