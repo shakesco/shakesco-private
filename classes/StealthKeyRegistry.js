@@ -35,10 +35,10 @@ class StealthKeyRegistry {
 
     // Throw if no stealth keys are set
     if (
-      spendingPubKeyPrefix.eq(0) ||
-      spendingPubKey.eq(0) ||
-      viewingPubKeyPrefix.eq(0) ||
-      viewingPubKey.eq(0)
+      spendingPubKeyPrefix == 0 ||
+      spendingPubKey == 0 ||
+      viewingPubKeyPrefix == 0 ||
+      viewingPubKey == 0
     ) {
       throw new Error(`Address ${account} has not registered stealth keys. Please ask them to setup their an account`); // prettier-ignore
     }
@@ -46,11 +46,11 @@ class StealthKeyRegistry {
     // Decompress keys and return them
     const spendingPublicKey = KeyPair.getUncompressedFromX(
       spendingPubKey,
-      spendingPubKeyPrefix.toNumber()
+      Number(spendingPubKeyPrefix)
     );
     const viewingPublicKey = KeyPair.getUncompressedFromX(
       viewingPubKey,
-      viewingPubKeyPrefix.toNumber()
+      Number(viewingPubKeyPrefix)
     );
     return { spendingPublicKey, viewingPublicKey };
   }

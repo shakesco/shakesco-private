@@ -3,6 +3,7 @@
  */
 const EC = require("elliptic").ec;
 // const { Buffer } = require('buffer/'); // TODO make sure this works in browser and node
+const { keccak256 } = require("js-sha3");
 const ethers = require("ethers");
 const {
   padHex,
@@ -15,13 +16,8 @@ async function loadApp() {
   return { getSharedSecret, ProjectivePoint, utils, getPublicKey, etc };
 }
 const ec = new EC("secp256k1");
-const {
-  keccak256,
-  zeroPadValue,
-  isHexString,
-  getAddress,
-  sha256,
-} = require("ethers");
+
+const { zeroPadValue, isHexString, getAddress, sha256 } = require("ethers");
 const { BigNumber } = require("@ethersproject/bignumber");
 
 class KeyPair {

@@ -25,7 +25,7 @@ const {
  * @param {String} bytes Number of bytes string should have
  */
 module.exports.padHex = (hex, bytes = 32) => {
-  if (!isHexString(hex)) throw new Error("Input is not a valid hex string");
+  if (!isHexString) throw new Error("Input is not a valid hex string");
   if (hex.slice(0, 2) === "0x") {
     throw new Error("Input must not contain 0x prefix");
   }
