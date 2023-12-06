@@ -16,7 +16,7 @@ class StealthKeyRegistry {
   constructor(signerOrProvider) {
     signerOrProvider.getNetwork().then((network) => {
       const stealthKeyRegistry =
-        network.id.toString() == "80001"
+        network.chainId.toString() == "80001"
           ? "0x9c2608361246B598d9587723bDBD3D5458eaE1C4"
           : "0x31fe56609C65Cd0C510E7125f051D440424D38f3";
       this._registry = new Contract(stealthKeyRegistry, abi, signerOrProvider);
