@@ -1,6 +1,8 @@
 const KeyPair = require("../classes/KeyPair");
 const { Contract } = require("ethers");
 
+const stealthKeyRegistry = "0x31fe56609C65Cd0C510E7125f051D440424D38f3";
+
 const abi = [
   'event StealthKeyChanged(address indexed registrant, uint256 spendingPubKeyPrefix, uint256 spendingPubKey, uint256 viewingPubKeyPrefix, uint256 viewingPubKey)',
   'function setStealthKeys(uint256 spendingPubKeyPrefix, uint256 spendingPubKey, uint256 viewingPubKeyPrefix, uint256 viewingPubKey)',
@@ -14,13 +16,7 @@ class StealthKeyRegistry {
    * @param signerOrProvider signer or provider to use
    */
   constructor(signerOrProvider) {
-    signerOrProvider.getNetwork().then((network) => {
-      const stealthKeyRegistry =
-        network.chainId.toString() == "80001"
-          ? "0x9c2608361246B598d9587723bDBD3D5458eaE1C4"
-          : "0x31fe56609C65Cd0C510E7125f051D440424D38f3";
-      this._registry = new Contract(stealthKeyRegistry, abi, signerOrProvider);
-    });
+    this._registry = new Contract(stealthKeyRegistry, abi, signerOrProvider);
   }
 
   /**
