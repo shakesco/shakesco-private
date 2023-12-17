@@ -41,7 +41,7 @@ class StealthKeyRegistry {
       viewingPubKeyPrefix == 0 ||
       viewingPubKey == 0
     ) {
-      throw new Error(`Address ${account} has not registered stealth keys. Please ask them to setup their an account`); // prettier-ignore
+      return { spendingPublicKey: "", viewingPublicKey: "" };
     }
 
     // Decompress keys and return them
