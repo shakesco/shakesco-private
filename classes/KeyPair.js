@@ -303,9 +303,9 @@ class KeyPair {
    * @param randomNumber Number to multiply by, as class RandomNumber or hex string with 0x prefix
    */
   static computeStealthPrivateKey(spendingPrivateKey, randomNumber) {
-    const spendingPrivateKeyPair = new KeyPair(spendingPrivateKey); // validates spendingPrivateKey
+    const spendingPrivateKeyPair = new KeyPair(spendingPrivateKey);
     const stealthFromPrivate =
-      spendingPrivateKeyPair.mulPrivateKey(randomNumber); // validates randomNumber
+      spendingPrivateKeyPair.mulPrivateKey(randomNumber);
     if (!stealthFromPrivate.privateKeyHex) {
       throw new Error(
         "Stealth key pair must have a private key: this should never occur"
