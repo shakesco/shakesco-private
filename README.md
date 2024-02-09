@@ -1,6 +1,6 @@
 # Shakesco Stealth Addresses
 
->Special credit to [_umbra-cash_](https://app.umbra.cash/ "Umbra")
+>Special credit to [_umbra-cash_](https://app.umbra.cash/ "Umbra").
 
 This package will allow you to perform private transactions where only the sender and receiver
 know the destination of the transaction. To understand how it works: [__umbra-docs__](https://app.umbra.cash/faq#how-does-it-work-technical "Umbra"), [__EIP 5564__](https://eips.ethereum.org/EIPS/eip-5564 "EIP 5564")
