@@ -19,6 +19,7 @@ const ec = new EC("secp256k1");
 
 const { zeroPadValue, isHexString, getAddress, sha256 } = require("ethers");
 const { BigNumber } = require("@ethersproject/bignumber");
+const crypto = require("crypto");
 
 class KeyPair {
   /**
@@ -187,7 +188,10 @@ class KeyPair {
     const { ProjectivePoint, utils, etc } = await loadApp();
 
     // Get shared secret to use as encryption key
-    const ephemeralPrivateKey = utils.randomPrivateKey();
+    const ephemeralPrivateKey = etc.hashToPrivateKey(
+      crypto.getRandomValues(new Uint8Array(32 + 16))
+    );
+
     const ephemeralPublicKey =
       ProjectivePoint.fromPrivateKey(ephemeralPrivateKey);
     const ephemeralPrivateKeyHex = `0x${etc.bytesToHex(ephemeralPrivateKey)}`;
