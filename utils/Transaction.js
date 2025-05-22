@@ -74,7 +74,7 @@ async function IsUsersFunds(
     const registry = new StealthKeyRegistry(provider);
     const { spendingPublicKey } = await registry.getStealthKeys(sender);
 
-    // Get what our receiving address would be with this random number
+    // Hash(s * r) to get the stealth address
     const spendingkey = new KeyPair(spendingPublicKey);
 
     const computedReceivingAddress =

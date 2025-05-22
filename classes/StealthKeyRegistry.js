@@ -58,8 +58,8 @@ class StealthKeyRegistry {
 
   /**
    * @notice Set stealth keys.
-   * @dev Use this if you users have smart wallets.
-   * @dev Get the returned values and create a userop/calldata from the values to the umbra registry or your registry.
+   * @dev Use this if your users have smart wallets.
+   * @dev Get the returned values and create a calldata from the values to the umbra registry or your registry.
    * @param spendingPublicKey The public key for generating a stealth address as hex string
    * @param viewingPublicKey The public key to use for encryption as hex string
    * @returns The addresses to register to the stealth registry
@@ -76,7 +76,7 @@ class StealthKeyRegistry {
 
   /**
    * @notice Set stealth keys.
-   * @dev Use this if you users have external owned wallets.
+   * @dev Use this if your users have external owned wallets.
    * @dev When they call the below function it will set or update the umbra registry and they can start sending private transactions!
    * @param spendingPublicKey The public key for generating a stealth address as hex string
    * @param viewingPublicKey The public key to use for encryption as hex string
