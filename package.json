@@ -1,6 +1,6 @@
 {
   "name": "@shakesco/private",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Shakesco Stealth payments package",
   "main": "index.js",
   "keywords": [
