@@ -1,19 +1,26 @@
-# Shakesco Stealth Addresses
+# @shakesco/private
 
-> Special credit to [_umbra-cash_](https://app.umbra.cash/ "Umbra").
+JavaScript SDK for building privacy-preserving Ethereum transfers using stealth addresses.
 
-This package will allow you to perform private transactions where only the sender and receiver
-know the destination of the transaction. To understand how it works: [**umbra-docs**](https://app.umbra.cash/faq#how-does-it-work-technical "Umbra"), [**EIP 5564**](https://eips.ethereum.org/EIPS/eip-5564 "EIP 5564")
+> Special credit to [Umbra Cash](https://app.umbra.cash/) for pioneering stealth payment infrastructure.
 
-_We assume that you have a single private key securing your wallet and that you are signing the same message hash. The former is not advised._
+## What It Does
 
-To get started:
+The `@shakesco/private` SDK lets you implement truly private crypto transactions. No one except the sender and receiver can link the payment to the recipient's known address.
 
-```shell
+**Learn more:**
+
+- [How it works (technical)](https://app.umbra.cash/faq#how-does-it-work-technical)
+- [EIP-5564 Standard](https://eips.ethereum.org/EIPS/eip-5564)
+- [Full documentation](https://docs.shakesco.com/stealth-payments/)
+
+## Installation
+
+```bash
 npm i @shakesco/private
 ```
 
-After installing:
+## Quick Start
 
 ```javascript
 const shakesco = require("@shakesco/private");
@@ -21,29 +28,34 @@ const { KeyPair, RandomNumber, StealthKeyRegistry, utils } = shakesco;
 const { IsUsersFunds, generateKeyPair, prepareSend } = shakesco;
 ```
 
-We use the umbra registry to register stealth keys. To check if user has keys:
+**Security Note:** This implementation assumes a single private key secures your wallet and that you're signing the same message hash.
+
+## Basic Workflow
+
+### 1. Check if User Has Stealth Keys
 
 ```javascript
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 const registry = new StealthKeyRegistry(provider);
 
-const { spendingPublicKey, viewingPublicKey } = await registry.getStealthKeys(
-  recipientId
-);
-console.log(spendingPublicKey);
-console.log(viewingPublicKey);
+const { spendingPublicKey, viewingPublicKey } =
+  await registry.getStealthKeys(recipientId);
+
+if (!spendingPublicKey) {
+  console.log("User needs to register stealth keys first");
+}
 ```
 
-If an empty string is returned the user has not registered for private transactions. So you register them as follows:
+### 2. Register Stealth Keys
 
-1. If you want to set keys for a smart wallet:
+**For Smart Wallets (ERC-4337):**
 
 ```javascript
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 const signer = new ethers.Wallet(process.env.PRIV_KEY, provider);
 const signature = await signer.signMessage(messageHash);
+
 const { spendingKeyPair, viewingKeyPair } = await generateKeyPair(signature);
-console.log(viewingKeyPair.privateKeyHex); // storing this for the user is okay! To fetch transactions for them easily. You can also choose to not store it.
 const registry = new StealthKeyRegistry(provider);
 
 const { spendingPrefix, spendingPubKeyX, viewingPrefix, viewingPubKeyX } =
@@ -51,11 +63,11 @@ const { spendingPrefix, spendingPubKeyX, viewingPrefix, viewingPubKeyX } =
     spendingKeyPair.publicKeyHex,
     viewingKeyPair.publicKeyHex
   );
+
+// Use these values to call the registry contract via your smart wallet
 ```
 
-> You can call the registry contract with the above details as the parameter.
-
-2. If you want to set keys for EOAs:
+**For EOAs (Regular Wallets):**
 
 ```javascript
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
@@ -69,47 +81,59 @@ const { spendingPrefix, spendingPubKeyX, viewingPrefix, viewingPubKeyX } =
   );
 ```
 
-Your user is now ready to perform private transactions. To prepare the payee to receive a private transaction:
+### 3. Generate Stealth Address
 
 ```javascript
-   const payee = //payee address
-   const provider = //node provider eg: alchemy
-   const { stealthKeyPair, pubKeyXCoordinate, encrypted } =
-        await prepareSend(address, provider);
-   console.log(stealthKeyPair.address);// address funds should be sent to. This is a stealth address that the payee can control.
-   console.log(pubKeyXCoordinate); // Public key that the payee will use to decrypt the ciphertext hence proving funds belong to them
-   console.log(encrypted.ciphertext);// Encrypted random number used to generate the stealth address.
+const payee = "0x..."; // Recipient's address
+const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
+
+const { stealthKeyPair, pubKeyXCoordinate, encrypted } = await prepareSend(
+  payee,
+  provider
+);
+
+console.log(stealthKeyPair.address); // Send funds HERE
+console.log(pubKeyXCoordinate); // Share with recipient
+console.log(encrypted.ciphertext); // Share with recipient
 ```
 
-> NOTE📓: You need to send the ciphertext and publickey to the payee. Otherwise they will not be able to prove ownership of funds. You can use tools like [**the graph**](https://thegraph.com/en/ "Graph") or [**moralis**](https://moralis.io/ "Moralis") to query the 'Announcement' from your private contract after a transaction has been initiated.
+**Important:** You must share `pubKeyXCoordinate` and `encrypted.ciphertext` with the recipient so they can prove ownership and spend the funds.
+
+### 4. Announce the Payment
+
+Emit this event from your contract so recipients can discover their payments:
 
 ```solidity
-  event Announcement (
-      uint256 indexed schemeId,
-      address indexed stealthAddress,
-      address indexed caller,
-      bytes ephemeralPubKey,
-      bytes metadata
-    );
+event Announcement(
+  address indexed receiver,
+  uint256 amount,
+  address indexed tokenAddress,
+  bytes32 pkx,
+  bytes32 ciphertext
+);
 ```
 
-To check if funds belong to a certain user:
+Use indexing services like [The Graph](https://thegraph.com/) or [Moralis](https://moralis.io/) to help recipients scan for announcements efficiently.
+
+### 5. Check if Funds Belong to User
 
 ```javascript
-IsUsersFunds(object.announcements[i], provider, secret, sender).then((data) => {
+IsUsersFunds(announcement, provider, viewingPrivateKey, sender).then((data) => {
   if (data.isForUser) {
-    //belongs to user
-    //perform any action you want with the data.
+    console.log("Amount:", data.amount);
+    console.log("Token:", data.tokenAddress);
+    console.log("Stealth address:", data.stealthAddress);
   }
 });
 ```
 
-If the funds belong to the user they can spend the funds. To create the private key that will be able to do this:
+### 6. Spend Private Funds
 
 ```javascript
 const provider = new ethers.JsonRpcProvider(process.env.RPC_URL);
 const signer = new ethers.Wallet(process.env.PRIV_KEY, provider);
 const signature = await signer.signMessage(messageHash);
+
 const { spendingKeyPair, viewingKeyPair } = await generateKeyPair(signature);
 
 const payload = {
@@ -117,19 +141,46 @@ const payload = {
   ciphertext: ciphertext,
 };
 
-const random = await viewkey.decrypt(payload);
+const random = await viewingKeyPair.decrypt(payload);
 
-const privkey = KeyPair.computeStealthPrivateKey(
+const stealthPrivateKey = KeyPair.computeStealthPrivateKey(
   spendingKeyPair.privateKeyHex,
-  random //decrypted random number
+  random
 );
 
-const wallet = new ethers.Wallet(privkey, provider);
+const wallet = new ethers.Wallet(stealthPrivateKey, provider);
 const txResponse = await wallet.sendTransaction({
   value: ethers.parseEther(value),
-  to: address,
+  to: destinationAddress,
 });
-const response = await txResponse.wait();
+
+await txResponse.wait();
+console.log("Private funds successfully transferred!");
 ```
 
-You have successfully sent a private transactions. We aim to help umbra expand the adoption of stealth payments. ZK will improve upon stealth addresses ensuring Ethereum is more private!
+## Documentation
+
+For complete integration guides and examples, visit: [docs.shakesco.com/stealth-payments](https://docs.shakesco.com/stealth-payments/)
+
+## About Stealth Addresses
+
+**What are spending and viewing keys?**
+
+- **Spending Keys** - Used to generate stealth addresses and spend from them
+- **Viewing Keys** - Allow scanning for incoming transactions without spending ability
+
+This separation means you can monitor for payments without risking your funds.
+
+**Note:** Storing `viewingKeyPair.privateKeyHex` for users is acceptable - it only enables transaction scanning, not spending.
+
+## Resources
+
+- [Umbra Protocol Docs](https://app.umbra.cash/faq)
+- [EIP-5564 Discussion](https://ethereum-magicians.org/t/eip-5564-stealth-addresses/10614)
+- [GitHub Repository](https://github.com/shakesco/shakesco-private)
+
+## Future
+
+While stealth addresses provide strong privacy today, zero-knowledge proofs will eventually offer even better solutions. Until then, stealth payments are the best way to bring privacy to Ethereum transactions.
+
+We aim to help expand the adoption of stealth payments and make Ethereum more private!
