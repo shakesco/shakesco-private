@@ -1,5 +1,7 @@
 # @shakesco/private
 
+> **This package is archived.** Shakesco no longer offers Ethereum stealth payments and nobody maintains this code. It gets no fixes and no security updates. The source stays here under the MIT license for anyone who wants to read or fork it. For Bitcoin silent payments, use [@shakesco/silent](https://www.npmjs.com/package/@shakesco/silent).
+
 JavaScript SDK for building privacy-preserving Ethereum transfers using stealth addresses.
 
 > Special credit to [Umbra Cash](https://app.umbra.cash/) for pioneering stealth payment infrastructure.
@@ -12,7 +14,6 @@ The `@shakesco/private` SDK lets you implement truly private crypto transactions
 
 - [How it works (technical)](https://app.umbra.cash/faq#how-does-it-work-technical)
 - [EIP-5564 Standard](https://eips.ethereum.org/EIPS/eip-5564)
-- [Full documentation](https://docs.shakesco.com/stealth-payments/)
 
 ## Installation
 
@@ -158,10 +159,6 @@ await txResponse.wait();
 console.log("Private funds successfully transferred!");
 ```
 
-## Documentation
-
-For complete integration guides and examples, visit: [docs.shakesco.com/stealth-payments](https://docs.shakesco.com/stealth-payments/)
-
 ## About Stealth Addresses
 
 **What are spending and viewing keys?**
@@ -178,9 +175,3 @@ This separation means you can monitor for payments without risking your funds.
 - [Umbra Protocol Docs](https://app.umbra.cash/faq)
 - [EIP-5564 Discussion](https://ethereum-magicians.org/t/eip-5564-stealth-addresses/10614)
 - [GitHub Repository](https://github.com/shakesco/shakesco-private)
-
-## Future
-
-While stealth addresses provide strong privacy today, zero-knowledge proofs will eventually offer even better solutions. Until then, stealth payments are the best way to bring privacy to Ethereum transactions.
-
-We aim to help expand the adoption of stealth payments and make Ethereum more private!
